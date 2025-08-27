@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Your custom CSS -->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+</head>
+<body>
+  <div class="container chat">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-xl-6">
+        <div class="card">
+          <div class="card-header d-flex align-items-center">
+            <div class="img_cont mr-2">
+              <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img">
+            </div>
+            <div class="user_info">
+              <h6 class="mb-0">Medical Chatbot</h6>
+              <small>Ask me anything!</small>
+            </div>
+          </div>
+          <div id="messageFormeight" class="card-body msg_card_body"></div>
+          <div class="card-footer">
+            <form id="messageArea" class="input-group">
+              <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+              <div class="input-group-append">
+                <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-paper-plane"></i></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery + Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Chat Logic -->
+  <script>
+    $(document).ready(function() {
+      $("#messageArea").on("submit", function(event) {
+        event.preventDefault();
+
+        const date = new Date();
+        const time = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const rawText = $("#text").val();
+
+        if (!rawText.trim()) return;
+
+        // User message
+        const userHtml = `
+          <div class="d-flex justify-content-end mb-4">
+            <div class="msg_cotainer_send">
+              ${rawText}
+              <span class="msg_time_send">${time}</span>
+            </div>
+          </div>`;
+        $("#text").val("");
+        $("#messageFormeight").append(userHtml);
+
+        // Bot response
+        $.ajax({
+          data: { msg: rawText },
+          type: "POST",
+          url: "/get",
+        }).done(function(data) {
+          const botHtml = `
+            <div class="d-flex justify-content-start mb-4">
+              <div class="msg_cotainer">
+                ${data}
+                <span class="msg_time">${time}</span>
+              </div>
+            </div>`;
+          $("#messageFormeight").append(botHtml);
+          $("#messageFormeight").scrollTop($("#messageFormeight")[0].scrollHeight);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
