@@ -22,7 +22,10 @@ os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 
 
 
+from src.helper import download_hugging_face_embeddings
 embeddings = download_hugging_face_embeddings()
+
+
 
 index_name = "medical-chatbot" 
 # Embed each chunk and upsert the embeddings into your Pinecone index.
