@@ -7,7 +7,9 @@ langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
 langchain-openai==0.3.24
-langchain-groq   # for ChatGroq support
+langchain-groq 
+langchain-huggingface
+  # for ChatGroq support
 
 # Embeddings & transformers
 sentence-transformers
