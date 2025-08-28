@@ -1,5 +1,4 @@
 # Built Chatbot-Medical with LLMs- Langchain-Pinecone-Flask-AWS-CI/CD
-
 1. Login to AWS console.
 2. Create IAM user for deployment
 #with specific access 
