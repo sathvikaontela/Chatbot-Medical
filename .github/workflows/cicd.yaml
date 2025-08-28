@@ -32,27 +32,26 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .  
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
 
   Continuous-Deployment:
-  needs: Continuous-Integration
-  runs-on: self-hosted
+    needs: Continuous-Integration   # ✅ properly nested
+    runs-on: self-hosted
 
-  steps:
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    steps:
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Run Docker Image to serve users
-      run: |
-        docker stop medicalbot || true
-        docker rm medicalbot || true
+      - name: Run Docker Image to serve users
+        run: |
+          docker stop medicalbot || true
+          docker rm medicalbot || true
 
-        docker pull 766377908014.dkr.ecr.us-east-2.amazonaws.com/medicalbot:latest
-        docker run -d --name medicalbot -p 8080:8080 \
-          --env AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-          --env AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
-          --env AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} \
-          --env PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }} \
-          --env GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
-          766377908014.dkr.ecr.us-east-2.amazonaws.com/medicalbot:latest
+          docker pull 766377908014.dkr.ecr.us-east-2.amazonaws.com/medicalbot:latest
+          docker run -d --name medicalbot -p 8080:8080 \
+            --env AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            --env AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            --env AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} \
+            --env PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }} \
+            --env GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
+            766377908014.dkr.ecr.us-east-2.amazonaws.com/medicalbot:latest
