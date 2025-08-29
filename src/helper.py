@@ -30,7 +30,8 @@ import os
 
 class HuggingFaceAPIEmbeddings(Embeddings):
     def __init__(self, model="sentence-transformers/all-MiniLM-L6-v2", token=None):
-        self.client = InferenceClient(token=token)
+        self.client = InferenceClient("BAAI/bge-small-en-v1.5", token=token)
+
         self.model = model   # store model name
 
     def embed_query(self, text: str):
