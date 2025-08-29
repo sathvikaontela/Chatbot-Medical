@@ -2,18 +2,18 @@ flask
 gunicorn
 python-dotenv
 
-# LangChain
+# LangChain (core + integrations you use)
 langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
 langchain-groq
-langchain-huggingface
-
-# Sentence Transformers (lightweight)
-sentence-transformers
 
 # Pinecone
 pinecone-client
 
-# PDF
+# Hugging Face Hub (for inference API, not local model downloads)
+huggingface-hub==0.24.6
+
+# PDF support
 pypdf
+
