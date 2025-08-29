@@ -4,6 +4,7 @@ from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain.schema import Document
+from langchain_core.embeddings import Embeddings
 
 # Extract text from PDF files
 def load_pdf_files(data):
@@ -24,19 +25,14 @@ def text_split(extracted_data):
     text_chunks = text_splitter.split_documents(extracted_data)
     return text_chunks
 
-from huggingface_hub import InferenceClient
-from langchain_core.embeddings import Embeddings
-import os
 
 class HuggingFaceAPIEmbeddings(Embeddings):
-    def __init__(self, model="sentence-transformers/all-MiniLM-L6-v2", token=None):
-        self.client = InferenceClient("BAAI/bge-small-en-v1.5", token=token)
-
-        self.model = model   # store model name
+    def __init__(self, model="BAAI/bge-small-en-v1.5", token=None):
+        self.model = model
+        self.client = InferenceClient(model, token=token)
 
     def embed_query(self, text: str):
         result = self.client.post(
-            model=self.model,
             task="feature-extraction",
             json={"inputs": text}
         )
@@ -46,7 +42,6 @@ class HuggingFaceAPIEmbeddings(Embeddings):
         embeddings = []
         for t in texts:
             result = self.client.post(
-                model=self.model,
                 task="feature-extraction",
                 json={"inputs": t}
             )
