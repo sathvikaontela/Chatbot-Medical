@@ -27,15 +27,19 @@ def text_split(extracted_data):
 from langchain_core.embeddings import Embeddings
 
 class HuggingFaceAPIEmbeddings(Embeddings):
-    def __init__(self, model="sentence-transformers/paraphrase-MiniLM-L3-v2", token=None):
+    def __init__(self, model="sentence-transformers/paraphrase-MiniLM-L6-v2", token=None):
         self.client = InferenceClient(model, token=token)
 
     def embed_query(self, text: str):
-        return self.client.feature_extraction(text)
+        result = self.client.feature_extraction(text)
+        return result[0] if isinstance(result[0], list) else result
 
     def embed_documents(self, texts):
-        return [self.client.feature_extraction(t) for t in texts]
-
+        embeddings = []
+        for t in texts:
+            result = self.client.feature_extraction(t)
+            embeddings.append(result[0] if isinstance(result[0], list) else result)
+        return embeddings
 
 def download_hugging_face_embeddings():
     """Return a LangChain-compatible embeddings object using HF Inference API"""
