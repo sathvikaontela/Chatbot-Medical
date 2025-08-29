@@ -22,8 +22,8 @@ os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 
 
 
-from src.helper import download_hugging_face_embeddings
-embeddings = download_hugging_face_embeddings()
+from src.helper import download_google_embeddings
+embeddings = download_google_embeddings()
 
 
 

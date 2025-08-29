@@ -11,9 +11,8 @@ langchain-groq
 # Pinecone
 pinecone-client
 
-# Hugging Face Hub (for inference API, not local model downloads)
-huggingface-hub==0.24.6
+# Google AI SDK
+google-genai==0.3.0  # use latest stable
 
 # PDF support
 pypdf
-

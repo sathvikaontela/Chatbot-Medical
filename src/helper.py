@@ -1,12 +1,14 @@
-from huggingface_hub import InferenceClient
 import os
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain.schema import Document
 from langchain_core.embeddings import Embeddings
+from google import genai
 
-# Extract text from PDF files
+# -------------------------
+# PDF utilities
+# -------------------------
 def load_pdf_files(data):
     loader = DirectoryLoader(data, glob="*.pdf", loader_cls=PyPDFLoader)
     documents = loader.load()
@@ -19,36 +21,40 @@ def filter_to_minimal_docs(docs: List[Document]) -> List[Document]:
         minimal_docs.append(Document(page_content=doc.page_content, metadata={"source": src}))
     return minimal_docs
 
-# Split the Data into Text Chunks
 def text_split(extracted_data):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
     text_chunks = text_splitter.split_documents(extracted_data)
     return text_chunks
 
-
-class HuggingFaceAPIEmbeddings(Embeddings):
-    def __init__(self, model="BAAI/bge-small-en-v1.5", token=None):
+# -------------------------
+# Google Gemini Embeddings
+# -------------------------
+class GoogleGeminiEmbeddings(Embeddings):
+    def __init__(self, model="models/embedding-001", api_key=None):
+        api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise ValueError("Missing GOOGLE_API_KEY in environment variables")
+        self.client = genai.Client(api_key=api_key)
         self.model = model
-        self.client = InferenceClient(model, token=token)
 
     def embed_query(self, text: str):
-        result = self.client.post(
-            task="feature-extraction",
-            json={"inputs": text}
+        response = self.client.models.embed_content(
+            model=self.model,
+            contents=text
         )
-        return result[0] if isinstance(result[0], list) else result
+        return response.embeddings[0].values
 
     def embed_documents(self, texts):
-        embeddings = []
+        vectors = []
         for t in texts:
-            result = self.client.post(
-                task="feature-extraction",
-                json={"inputs": t}
+            response = self.client.models.embed_content(
+                model=self.model,
+                contents=t
             )
-            embeddings.append(result[0] if isinstance(result[0], list) else result)
-        return embeddings
+            vectors.append(response.embeddings[0].values)
+        return vectors
 
 
-def download_hugging_face_embeddings():
-    hf_token = os.getenv("HF_API_TOKEN")
-    return HuggingFaceAPIEmbeddings(token=hf_token)
+def download_google_embeddings():
+    """Return a LangChain-compatible embeddings object using Google Gemini API"""
+    return GoogleGeminiEmbeddings()
