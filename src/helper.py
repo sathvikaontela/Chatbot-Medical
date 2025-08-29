@@ -29,7 +29,7 @@ from langchain_core.embeddings import Embeddings
 import os
 
 class HuggingFaceAPIEmbeddings(Embeddings):
-    def __init__(self, model="sentence-transformers/paraphrase-MiniLM-L6-v2", token=None):
+    def __init__(self, model="sentence-transformers/all-MiniLM-L6-v2", token=None):
         self.client = InferenceClient(token=token)
         self.model = model   # store model name
 
@@ -51,6 +51,7 @@ class HuggingFaceAPIEmbeddings(Embeddings):
             )
             embeddings.append(result[0] if isinstance(result[0], list) else result)
         return embeddings
+
 
 def download_hugging_face_embeddings():
     hf_token = os.getenv("HF_API_TOKEN")
