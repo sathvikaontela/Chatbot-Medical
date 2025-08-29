@@ -43,14 +43,14 @@ def text_split(extracted_data):
     return text_chunks
 
 
-# ✅ Download the Embeddings from HuggingFace Inference API
 def download_hugging_face_embeddings():
     api_key = os.getenv("HUGGINGFACEHUB_API_TOKEN")
     if not api_key:
-        raise ValueError("Missing HUGGINGFACEHUB_API_TOKEN in environment variables")
+        raise ValueError("❌ Missing HUGGINGFACEHUB_API_TOKEN in environment variables")
 
-    embeddings = HuggingFaceInferenceAPIEmbeddings(
+    print("✅ Using Hugging Face Inference API embeddings with MiniLM-L6-v2")
+
+    return HuggingFaceInferenceAPIEmbeddings(
         api_key=api_key,
-        model_name="sentence-transformers/all-MiniLM-L6-v2"  # 384-dim output
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-    return embeddings
