@@ -3,11 +3,9 @@ gunicorn
 python-dotenv
 pypdf
 
-# LangChain ecosystem
 langchain
 langchain-community
 langchain-pinecone
-langchain-groq   # let pip pick latest compatible
+langchain-groq
+langchain-huggingface
 
-# Hugging Face API client
-huggingface-hub
