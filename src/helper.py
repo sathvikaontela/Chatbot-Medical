@@ -24,13 +24,20 @@ def text_split(extracted_data):
     text_chunks = text_splitter.split_documents(extracted_data)
     return text_chunks
 
-# --- NEW: Hugging Face Inference API client ---
-_hf_client = None
+from langchain_core.embeddings import Embeddings
+
+class HuggingFaceAPIEmbeddings(Embeddings):
+    def __init__(self, model="sentence-transformers/paraphrase-MiniLM-L3-v2", token=None):
+        self.client = InferenceClient(model, token=token)
+
+    def embed_query(self, text: str):
+        return self.client.feature_extraction(text)
+
+    def embed_documents(self, texts):
+        return [self.client.feature_extraction(t) for t in texts]
+
 
 def download_hugging_face_embeddings():
-    """Return an embedding function using Hugging Face Inference API"""
-    global _hf_client
-    if _hf_client is None:
-        hf_token = os.getenv("HF_API_TOKEN")
-        _hf_client = InferenceClient("sentence-transformers/paraphrase-MiniLM-L3-v2", token=hf_token)
-    return _hf_client.feature_extraction
+    """Return a LangChain-compatible embeddings object using HF Inference API"""
+    hf_token = os.getenv("HF_API_TOKEN")
+    return HuggingFaceAPIEmbeddings(token=hf_token)
